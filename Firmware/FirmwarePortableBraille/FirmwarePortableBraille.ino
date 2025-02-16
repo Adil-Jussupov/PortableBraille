@@ -16,7 +16,13 @@
 #define BTN8 26
 #define BTN9 18
 
+#define POWERON 4
+
+
+#include <BleKeyboard.h>.  // library to conver device to BLE HID (Bluetooth keyboard)
 #include "brailleconst.h"  // arrays for conversion to Braille
+
+BleKeyboard blePortableBraille ("PortableBraille", "TreeHacks2025", 69);;
 
 // variables for multiple buttons pressing
 bool hasKeyPressed = false;      // variable for tracking and releasing pressed key
@@ -40,10 +46,18 @@ GButton buttBSpace(BTN8);
 GButton buttEnter(BTN9);
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
+  Serial.println("Starting BLE connection");
+  blePortableBraille.begin();
+
+  pinMode(POWERON, OUTPUT);  // pin for turning DC-DC converter on
+  digitalWrite(POWERON, HIGH); // turn off DC-DC
+  while (!blePortableBraille.isConnected()) {} // wait untill bluetooth connected
+  Serial.println("BLE Connected");
 }
 
 void loop() {
+  
   // tick every cycle to check buttons
   butt1.tick();
   butt2.tick();
@@ -98,14 +112,17 @@ void loop() {
   }
 
   if (buttSpace.isClick()) {
-    Serial.print(" "); // WhiteSpace
+    blePortableBraille.print(" ");
+    Serial.print(" ");  // WhiteSpace
     hasKeyPressed = true;
   }
   if (buttEnter.isClick()) {
+    blePortableBraille.write(KEY_RETURN);
     Serial.print("Enter");
     hasKeyPressed = true;
   }
   if (buttBSpace.isClick()) {
+    blePortableBraille.print(" ");
     Serial.print("BackSpace");
     hasKeyPressed = true;
   }
@@ -117,6 +134,7 @@ void loop() {
       } else {
         // Serial.print(number, BIN);
         // Serial.print(" - ");
+        blePortableBraille.print((char)asciiCodes[number]);
         Serial.print((char)asciiCodes[number]);
         // Serial.println(";");
         hasKeyPressed = true;
