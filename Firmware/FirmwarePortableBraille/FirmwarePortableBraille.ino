@@ -1,16 +1,34 @@
+// TreeHacks 2025
+// PortableBraille by Adil Jussupov
+// Jussupov@stanford.edu
+
 // Define constants for pins for buttons
-// mini-ESP32 
+// mini-ESP32
 #define BTN1 33
 #define BTN2 19
 #define BTN3 5
+
 #define BTN4 21
 #define BTN5 17
 #define BTN6 16
+
 #define BTN7 23
 #define BTN8 26
 #define BTN9 18
 
-#include "GyverButton.h" // buttons library
+#include "brailleconst.h"  // arrays for conversion to Braille
+
+// variables for multiple buttons pressing
+bool hasKeyPressed = false;      // variable for tracking and releasing pressed key
+long keyPreviusTime = millis();  // temp var for time
+long keyReleasTime = 10;         // time have key pressed
+
+int number = 0;
+long previousTime = millis();
+long updatePeriod = 50;
+
+
+#include "GyverButton.h"  // buttons library
 GButton butt1(BTN1);
 GButton butt2(BTN2);
 GButton butt3(BTN3);
@@ -38,13 +56,79 @@ void loop() {
   buttEnter.tick();
 
   // check if button was pressed
-  if (butt1.isClick()) Serial.println("1");
-  if (butt2.isClick()) Serial.println("2");
-  if (butt3.isClick()) Serial.println("3");
-  if (butt4.isClick()) Serial.println("4");
-  if (butt5.isClick()) Serial.println("5");
-  if (butt6.isClick()) Serial.println("6");
-  if (buttSpace.isClick()) Serial.println("Space");
-  if (buttBSpace.isClick()) Serial.println("BackSpace");
-  if (buttEnter.isClick()) Serial.println("Enter");
+  if (butt1.isClick()) {
+    if (!number) previousTime = millis();
+    if (!(number & (1 << 0))) {
+      number += 1 << 0;
+    }
+  }
+  if (butt2.isClick()) {
+    if (!number) previousTime = millis();
+    if (!(number & (1 << 1))) {
+      number += 1 << 1;
+    }
+  }
+
+  if (butt3.isClick()) {
+    if (!number) previousTime = millis();
+    if (!(number & (1 << 2))) {
+      number += 1 << 2;
+    }
+  }
+
+  if (butt4.isClick()) {
+    if (!number) previousTime = millis();
+    if (!(number & (1 << 3))) {
+      number += 1 << 3;
+    }
+  }
+
+  if (butt5.isClick()) {
+    if (!number) previousTime = millis();
+    if (!(number & (1 << 4))) {
+      number += 1 << 4;
+    }
+  }
+
+  if (butt6.isClick()) {
+    if (!number) previousTime = millis();
+    if (!(number & (1 << 5))) {
+      number += 1 << 5;
+    }
+  }
+
+  if (buttSpace.isClick()) {
+    Serial.println("Space");
+    hasKeyPressed = true;
+  }
+  if (buttEnter.isClick()) {
+    Serial.println("Enter");
+    hasKeyPressed = true;
+  }
+  if (buttBSpace.isClick()) {
+    Serial.println("BackSpace");
+    hasKeyPressed = true;
+  }
+
+  if (previousTime < (millis() - updatePeriod)) {
+    if (number) {
+      if (number >= B1000000) {
+        Serial.println("Send text");
+      } else {
+        Serial.print(number, BIN);
+        Serial.print(" - ");
+        Serial.print((char)asciiCodes[number]);
+        Serial.println(";");
+        hasKeyPressed = true;
+      }
+      number = 0;
+      previousTime = millis();
+    }
+  }
+
+  if (hasKeyPressed) {
+    if ((millis() - keyPreviusTime) >= keyReleasTime) {
+      hasKeyPressed = false;
+    }
+  }
 }
