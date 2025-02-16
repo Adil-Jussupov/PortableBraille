@@ -98,27 +98,27 @@ void loop() {
   }
 
   if (buttSpace.isClick()) {
-    Serial.println("Space");
+    Serial.print(" "); // WhiteSpace
     hasKeyPressed = true;
   }
   if (buttEnter.isClick()) {
-    Serial.println("Enter");
+    Serial.print("Enter");
     hasKeyPressed = true;
   }
   if (buttBSpace.isClick()) {
-    Serial.println("BackSpace");
+    Serial.print("BackSpace");
     hasKeyPressed = true;
   }
 
   if (previousTime < (millis() - updatePeriod)) {
     if (number) {
       if (number >= B1000000) {
-        Serial.println("Send text");
+        // Serial.println("Send text");
       } else {
-        Serial.print(number, BIN);
-        Serial.print(" - ");
+        // Serial.print(number, BIN);
+        // Serial.print(" - ");
         Serial.print((char)asciiCodes[number]);
-        Serial.println(";");
+        // Serial.println(";");
         hasKeyPressed = true;
       }
       number = 0;
