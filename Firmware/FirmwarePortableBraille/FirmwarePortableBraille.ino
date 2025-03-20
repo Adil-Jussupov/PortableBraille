@@ -18,6 +18,12 @@
 
 #define POWERON 4
 
+int datainPin = 32;  //to cell, 'in' from perspective braille cell
+int strobePin = 25;  //to cell
+int clockPin = 27;   //to cell
+int powerPin = 4;   //!goes to DCDC
+unsigned int i;
+float delaytime = 0.25;
 
 #include <BleKeyboard.h>.  // library to conver device to BLE HID (Bluetooth keyboard)
 #include "brailleconst.h"  // arrays for conversion to Braille
@@ -46,6 +52,15 @@ GButton buttBSpace(BTN8);
 GButton buttEnter(BTN9);
 
 void setup() {
+
+  //pinMode(powerPin, OUTPUT);
+  pinMode(powerPin, OUTPUT);
+  digitalWrite(powerPin, LOW);  // controlpin for DCDC converter (low is on)
+  pinMode(datainPin, OUTPUT);
+  pinMode(strobePin, OUTPUT);
+  pinMode(clockPin, OUTPUT);
+  delay(50);
+
   Serial.begin(115200);
   Serial.println("Starting BLE connection");
   blePortableBraille.begin();
@@ -75,12 +90,48 @@ void loop() {
     if (!(number & (1 << 0))) {
       number += 1 << 0;
     }
+
+    digitalWrite(strobePin, LOW);   // low for setting data, high for using data
+  for (i = 0; i < 64; i++)        //we have five cells of eight pins, so amount is 40
+  {
+    digitalWrite(clockPin, LOW);  // set clock low before sending value for 1 braille pin
+    if ((i %2) == 0)              
+    {
+      digitalWrite(datainPin, LOW);
+    }
+    else
+    {
+      digitalWrite(datainPin, HIGH);
+    }
+    delay(delaytime);              //delay must be very short
+    digitalWrite(clockPin, HIGH);  //set clock low
+    delay(delaytime);
+  }
+digitalWrite(strobePin, HIGH);   //pattern is set and
   }
   if (butt2.isClick()) {
     if (!number) previousTime = millis();
     if (!(number & (1 << 1))) {
       number += 1 << 1;
     }
+
+    digitalWrite(strobePin, LOW);  // low for setting, high for using data
+  for (i = 0; i < 64; i++)
+  {
+    digitalWrite(clockPin, LOW);  // set clock low
+    if ((i %2) == 0)              //odd pins go down, even ones go up
+    {
+      digitalWrite(datainPin, HIGH);
+    }
+    else
+    {
+      digitalWrite(datainPin, LOW);
+    }
+    delay(delaytime);              
+    digitalWrite(clockPin, HIGH);  
+    delay(delaytime);
+  }
+digitalWrite(strobePin, HIGH);
   }
 
   if (butt3.isClick()) {
@@ -88,6 +139,23 @@ void loop() {
     if (!(number & (1 << 2))) {
       number += 1 << 2;
     }
+    digitalWrite(strobePin, LOW);   // low for setting data, high for using data
+  for (i = 0; i < 64; i++)        //we have five cells of eight pins, so amount is 40
+  {
+    digitalWrite(clockPin, LOW);  // set clock low before sending value for 1 braille pin
+    if ((i %2) == 0)              
+    {
+      digitalWrite(datainPin, LOW);
+    }
+    else
+    {
+      digitalWrite(datainPin, HIGH);
+    }
+    delay(delaytime);              //delay must be very short
+    digitalWrite(clockPin, HIGH);  //set clock low
+    delay(delaytime);
+  }
+digitalWrite(strobePin, HIGH);   //pattern is set and
   }
 
   if (butt4.isClick()) {
@@ -95,6 +163,24 @@ void loop() {
     if (!(number & (1 << 3))) {
       number += 1 << 3;
     }
+
+    digitalWrite(strobePin, LOW);  // low for setting, high for using data
+  for (i = 0; i < 64; i++)
+  {
+    digitalWrite(clockPin, LOW);  // set clock low
+    if ((i %2) == 0)              //odd pins go down, even ones go up
+    {
+      digitalWrite(datainPin, HIGH);
+    }
+    else
+    {
+      digitalWrite(datainPin, LOW);
+    }
+    delay(delaytime);              
+    digitalWrite(clockPin, HIGH);  
+    delay(delaytime);
+  }
+digitalWrite(strobePin, HIGH);
   }
 
   if (butt5.isClick()) {
@@ -102,6 +188,24 @@ void loop() {
     if (!(number & (1 << 4))) {
       number += 1 << 4;
     }
+
+    digitalWrite(strobePin, LOW);   // low for setting data, high for using data
+  for (i = 0; i < 64; i++)        //we have five cells of eight pins, so amount is 40
+  {
+    digitalWrite(clockPin, LOW);  // set clock low before sending value for 1 braille pin
+    if ((i %2) == 0)              
+    {
+      digitalWrite(datainPin, LOW);
+    }
+    else
+    {
+      digitalWrite(datainPin, HIGH);
+    }
+    delay(delaytime);              //delay must be very short
+    digitalWrite(clockPin, HIGH);  //set clock low
+    delay(delaytime);
+  }
+digitalWrite(strobePin, HIGH);   //pattern is set and
   }
 
   if (butt6.isClick()) {
@@ -109,6 +213,25 @@ void loop() {
     if (!(number & (1 << 5))) {
       number += 1 << 5;
     }
+
+
+    digitalWrite(strobePin, LOW);  // low for setting, high for using data
+  for (i = 0; i < 64; i++)
+  {
+    digitalWrite(clockPin, LOW);  // set clock low
+    if ((i %2) == 0)              //odd pins go down, even ones go up
+    {
+      digitalWrite(datainPin, HIGH);
+    }
+    else
+    {
+      digitalWrite(datainPin, LOW);
+    }
+    delay(delaytime);              
+    digitalWrite(clockPin, HIGH);  
+    delay(delaytime);
+  }
+digitalWrite(strobePin, HIGH);
   }
 
   if (buttSpace.isClick()) {
@@ -149,4 +272,12 @@ void loop() {
       hasKeyPressed = false;
     }
   }
+// ///////////////////////////////////////////////////////////
+
+
+
+
+
+// ///////////////////////////////////////////////////////////
+  
 }
